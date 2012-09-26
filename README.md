@@ -35,15 +35,16 @@ Pre-requisites:
 
 Installation
 ===================
-Easy way:
-    Just copy the .cpp and .h files to your project and build it.
-
-Not so easy way:
-
 1) Clone git repository
 ```
     git clone git://github.com/filipenf/libxml-cpp-wrapper.git
 ```
+
+** Easiest way: **
+    2) Just copy the .cpp and .h files to your project and build it.
+
+** 2nd easiest way :-): **
+
 2) Build the project
 ```
     mkdir build && cd build

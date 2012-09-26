@@ -5,14 +5,10 @@ A simple C++ wrapper to the libxml
 
 I created this small library to simplify the libxml's API for C++ developers.
 
-As simple as:
-
-XMLReader reader(xml_string);
-reader.parse();
-string office_phone = reader.getNodes()[0]["Customer"]["ContactInfo"]["OfficePhone"].text;
-
-for a xml like this:
-
+Example
+====================
+For a xml like this:
+```xml
 <CustomerList>
     <Customer>
         <Name>John Smith</Name>
@@ -22,6 +18,13 @@ for a xml like this:
         </ContactInfo>
     </Customer>
 </CustomerList>
+```
+The code to parse and get the value of OfficePhone tag is:
+```c++
+XMLReader reader(xml_string);
+reader.parse();
+string office_phone = reader.getNodes()[0]["Customer"]["ContactInfo"]["OfficePhone"].text;
+```
 
 
 Pre-requisites:
@@ -38,15 +41,18 @@ Easy way:
 Not so easy way:
 
 1) Clone git repository
-    # git clone git://github.com/filipenf/libxml-cpp-wrapper.git
+```
+    git clone git://github.com/filipenf/libxml-cpp-wrapper.git
+```
 2) Build the project
-    # mkdir build && cd build
-    # cmake ../libxml-cpp-wrapper
-    # make && sudo make install
-
-While making it's possible that you get some error about including libxml2
-headers. The included path in the cmake is /usr/local/include/libxml2/, you
-can adjust it for your system.
+```
+    mkdir build && cd build
+    cmake ../libxml-cpp-wrapper
+    make && sudo make install
+```
+If may find some errors about the inclusion of libxml headers. Make sure your
+libxml2 include directory is /usr/local/include/libxml2 or you can adjust it
+in the CMakeFiles.txt
 
 After the instalation a library named xmlcppwrapper will be installed in your
 system. You should link your project to it.

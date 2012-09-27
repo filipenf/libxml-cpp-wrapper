@@ -9,13 +9,25 @@
 /**
  * Begin of XMLNode's implementation
  * */
+    
+XMLNode XMLNode::NULL_NODE;
+XMLNode const XMLNode::END_NODE;
+
 XMLNode& XMLNode::operator[](const string &name) {
-    static XMLNode null_node;
-    if ( children[name].size() > 0 ) {
-        return *(children[name].begin());
+    XMLNode::MapType::iterator it = children.find(name); 
+    if ( it != children.end() ) {
+        return *it->second.begin();
     } else {
-        return null_node;
+        return NULL_NODE;
     }
+}
+
+XMLNode::ListType::iterator XMLNode::FirstChild(const std::string &name) {
+    return children[name].begin();
+ }
+
+XMLNode::ListType::iterator XMLNode::LastChild(const std::string &name) {
+    return children[name].end();
 }
 
 /**
@@ -23,7 +35,6 @@ XMLNode& XMLNode::operator[](const string &name) {
  * */
 XMLReader::XMLReader(const std::string &xml) : doc_(NULL) {
 	doc_ = xmlParseMemory(xml.c_str(), xml.size());
-    parse();
 }
 
 XMLReader::~XMLReader() {
@@ -45,7 +56,7 @@ void XMLReader::populateNode(xmlNode* node, XMLNode &result) {
     getChildren(node, result);
 }
 
-void XMLReader::parse() {
+void XMLReader::parse(list<XMLNode> &nodes) {
     LOG_DEBUG("XMLReader::parse")
     xmlNode *current = xmlDocGetRootElement(doc_);
     while ( current != NULL ) {

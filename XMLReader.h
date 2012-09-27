@@ -9,7 +9,7 @@
  *
  * */
 #include <string>
-#include <vector>
+#include <list>
 #include <map>
 #include <stdexcept>
 #include <libxml/parser.h>
@@ -18,7 +18,7 @@
 using std::runtime_error;
 using std::string;
 using std::map;
-using std::vector;
+using std::list;
 
 class XMLReaderException : public runtime_error {
 public:
@@ -27,14 +27,23 @@ public:
 
 };
 
-struct XMLNode {
-    typedef vector<XMLNode>::iterator iterator;
+class XMLNode {
+public:
+    static XMLNode NULL_NODE;
+    static const XMLNode END_NODE;
+
+//    typedef vector<XMLNode>::iterator iterator;
+    typedef list<XMLNode> ListType;
+    typedef map<string, ListType> MapType;
+
     string name; // tag name
-    string text;
+    string text; // tag value ( if is a text tag )
     map<string, string> attributes;
-    map<string, vector<XMLNode> > children;
+    MapType children;
 
     XMLNode& operator[](const std::string &name);
+    ListType::iterator FirstChild(const std::string &name);
+    ListType::iterator LastChild(const std::string &name);
 };
 
 class XMLReader {
@@ -42,14 +51,11 @@ public:
     XMLReader(const string &o);
     ~XMLReader();
 
-    void parse();
+    void parse(list<XMLNode> &);
     bool findNode(const string&);
-    vector<XMLNode>& getNodes() { return nodes; };
 private:
     xmlDoc *doc_;
 
-    vector<XMLNode> nodes;
-    
     void getAttributes(xmlNode *node, map<string,string>&data);
     void getChildren(xmlNode *node, XMLNode &result);
     void populateNode(xmlNode* node, XMLNode &result);

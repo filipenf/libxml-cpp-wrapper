@@ -46,19 +46,46 @@ public:
     ListType::iterator LastChild(const std::string &name);
 };
 
+struct XMLFileParser {
+    xmlDocPtr parse(const std::string &);
+};
+
+struct XMLMemoryParser {
+    xmlDocPtr parse(const std::string &);
+};
+
+void getAttributes(xmlNode *node, map<string,string>&data);
+void getChildren(xmlNode *node, XMLNode &result);
+void populateNode(xmlNode* node, XMLNode &result);
+
+template<class Parser>
 class XMLReader {
 public:
-    XMLReader(const string &o);
-    ~XMLReader();
+    XMLReader(const string &o) : parser_(), doc_(NULL) {
+        doc_ = parser_.parse(o);
 
-    void parse(list<XMLNode> &);
+    };
+    ~XMLReader() {
+        if ( doc_ != NULL ) {
+            xmlFreeDoc(doc_);
+        }
+    };
+
+    void parse(list<XMLNode> &nodes) {
+        xmlNode *current = xmlDocGetRootElement(doc_);
+        while ( current != NULL ) {
+            XMLNode result;
+            populateNode(current, result);
+            nodes.push_back(result);
+            current = current->next;
+        }
+    };
+
     bool findNode(const string&);
 private:
-    xmlDoc *doc_;
+    Parser parser_;
+    xmlDocPtr doc_;
 
-    void getAttributes(xmlNode *node, map<string,string>&data);
-    void getChildren(xmlNode *node, XMLNode &result);
-    void populateNode(xmlNode* node, XMLNode &result);
 };
 
 #endif // XML_READER_H_

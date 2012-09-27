@@ -31,19 +31,23 @@ XMLNode::ListType::iterator XMLNode::LastChild(const std::string &name) {
 }
 
 /**
+ * Begin of XMLMemoryParser's implementation
+ * */
+xmlDocPtr XMLMemoryParser::parse(const std::string &xml) {
+    return xmlParseMemory(xml.c_str(), xml.size());
+}
+
+/**
+ * Begin of XMLFileParser's implementation
+ * */
+xmlDocPtr XMLFileParser::parse(const std::string &file) {
+    return xmlParseFile(file.c_str());
+}
+
+/**
  * Begin of XMLReader's implementation
  * */
-XMLReader::XMLReader(const std::string &xml) : doc_(NULL) {
-	doc_ = xmlParseMemory(xml.c_str(), xml.size());
-}
-
-XMLReader::~XMLReader() {
-    if ( doc_ != NULL ) {
-        xmlFreeDoc(doc_);
-    }
-}
-
-void XMLReader::populateNode(xmlNode* node, XMLNode &result) {
+void populateNode(xmlNode* node, XMLNode &result) {
     result.name = string((const char*)node->name);
     LOG_DEBUG("XMLReader::populateNode "<<result.name)
     if ( node->xmlChildrenNode != NULL &&
@@ -56,19 +60,7 @@ void XMLReader::populateNode(xmlNode* node, XMLNode &result) {
     getChildren(node, result);
 }
 
-void XMLReader::parse(list<XMLNode> &nodes) {
-    LOG_DEBUG("XMLReader::parse")
-    xmlNode *current = xmlDocGetRootElement(doc_);
-    while ( current != NULL ) {
-        LOG_DEBUG("creating node for " << (char*) current->name);
-        XMLNode result;
-        populateNode(current, result);
-        nodes.push_back(result);
-        current = current->next;
-    }
-}
-
-void XMLReader::getChildren(xmlNode* node, XMLNode &result) {
+void getChildren(xmlNode* node, XMLNode &result) {
     LOG_DEBUG("XMLReader::getChildren " << node->name)
     if ( node->type != XML_ELEMENT_NODE ) return;
     node = node->children;
@@ -80,7 +72,7 @@ void XMLReader::getChildren(xmlNode* node, XMLNode &result) {
     }
 }
 
-void XMLReader::getAttributes(xmlNode *node, map<string,string> &data) {
+void getAttributes(xmlNode *node, map<string,string> &data) {
     LOG_DEBUG("XMLReader::getAttributes")
     for(xmlAttrPtr attr = node->properties;
             attr != NULL; attr = attr->next) {

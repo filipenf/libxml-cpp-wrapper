@@ -22,11 +22,16 @@ XMLNode& XMLNode::operator[](const string &name) {
     }
 }
 
-XMLNode::ListType::iterator XMLNode::FirstChild(const std::string &name) {
+bool XMLNode::hasChild(const string &name) {
+    XMLNode::MapType::iterator it = children.find(name); 
+    return it != children.end();
+}
+
+XMLNode::ListType::iterator XMLNode::firstChild(const std::string &name) {
     return children[name].begin();
  }
 
-XMLNode::ListType::iterator XMLNode::LastChild(const std::string &name) {
+XMLNode::ListType::iterator XMLNode::lastChild(const std::string &name) {
     return children[name].end();
 }
 
@@ -49,19 +54,16 @@ xmlDocPtr XMLFileParser::parse(const std::string &file) {
  * */
 void populateNode(xmlNode* node, XMLNode &result) {
     result.name = string((const char*)node->name);
-    LOG_DEBUG("XMLReader::populateNode "<<result.name)
     if ( node->xmlChildrenNode != NULL &&
             node->xmlChildrenNode->type == XML_TEXT_NODE ) {
         result.text = string((char*)
                 xmlNodeGetContent(node->xmlChildrenNode));
-        LOG_DEBUG(">>Found XML_TEXT_NODE value = "<<result.text)
     }
     getAttributes(node, result.attributes);
     getChildren(node, result);
 }
 
 void getChildren(xmlNode* node, XMLNode &result) {
-    LOG_DEBUG("XMLReader::getChildren " << node->name)
     if ( node->type != XML_ELEMENT_NODE ) return;
     node = node->children;
     while ( node != NULL ) {
@@ -73,11 +75,8 @@ void getChildren(xmlNode* node, XMLNode &result) {
 }
 
 void getAttributes(xmlNode *node, map<string,string> &data) {
-    LOG_DEBUG("XMLReader::getAttributes")
     for(xmlAttrPtr attr = node->properties;
             attr != NULL; attr = attr->next) {
-        LOG_DEBUG("Attribute: "<<attr->name<<" = "<<
-                xmlNodeGetContent(attr->children));
         data.insert(std::make_pair(string((const char*)attr->name),
                     (const char*)xmlNodeGetContent(attr->children)));
     }

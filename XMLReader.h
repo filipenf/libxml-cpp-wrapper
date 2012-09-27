@@ -42,8 +42,9 @@ public:
     MapType children;
 
     XMLNode& operator[](const std::string &name);
-    ListType::iterator FirstChild(const std::string &name);
-    ListType::iterator LastChild(const std::string &name);
+    ListType::iterator firstChild(const std::string &name);
+    ListType::iterator lastChild(const std::string &name);
+    bool hasChild(const std::string &name);
 };
 
 struct XMLFileParser {

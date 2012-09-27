@@ -21,9 +21,11 @@ For a xml like this:
 ```
 The code to parse and get the value of OfficePhone tag is:
 ```c++
+list<XMLNode> nodes;
 XMLReader reader(xml_string);
-reader.parse();
-string office_phone = reader.getNodes()[0]["Customer"]["ContactInfo"]["OfficePhone"].text;
+reader.parse(nodes);
+XMLNode &node = *nodes.begin();
+string office_phone = node["Customer"]["ContactInfo"]["OfficePhone"].text;
 ```
 
 

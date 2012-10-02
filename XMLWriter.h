@@ -1,12 +1,16 @@
 #ifndef XML_WRAPPER_WRITER_H_
 #define XML_WRAPPER_WRITER_H_
+
+#include "XMLNode.h"
+
+#include <string>
 #include <libxml/encoding.h> 
 #include <libxml/xmlwriter.h> 
 #include <libxml/parser.h> 
 #include <libxml/tree.h> 
 
-#include "XMLNode.h"
- 
+using std::string;
+
 class MemoryWriter {
 public:
     MemoryWriter();
@@ -18,17 +22,26 @@ private:
     xmlTextWriterPtr writer_;
 };
 
+struct DTDInfo {
+    string name;
+    string id;
+    string url;
+};
+
 class XMLDocument {
 public:
     XMLDocument(xmlTextWriterPtr writer);
+    XMLDocument(xmlTextWriterPtr writer, const DTDInfo &info);
     ~XMLDocument();
 
+    void init();
     void writeNode(XMLNode& node);
     void writeChildren(XMLNode::MapType &children);
     void writeAttributes(map<string, string> &attr);
 
 private:
     xmlTextWriterPtr writer_;
+    DTDInfo dtdInfo_;
 };
 
 template <class Medium>

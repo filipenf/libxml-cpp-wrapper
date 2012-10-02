@@ -13,14 +13,34 @@ xmlTextWriterPtr MemoryWriter::getWriter() {
     return writer_;
 }
 
+/*************************************************************
+ * Begin of XMLDocument's implementation                     * 
+ *                                                           * 
+ ************************************************************/
+
 XMLDocument::XMLDocument(xmlTextWriterPtr writer) :
     writer_(writer) {
-    xmlTextWriterStartDocument(writer_, "1.0", "UTF-8", NULL);
-    xmlTextWriterSetIndent(writer_, 1);
+}
+
+XMLDocument::XMLDocument(xmlTextWriterPtr writer, const DTDInfo &info) :
+    writer_(writer),
+    dtdInfo_(info) {
 }
 
 XMLDocument::~XMLDocument() {
     xmlTextWriterEndDocument(writer_);
+}
+
+void XMLDocument::init() {
+    xmlTextWriterStartDocument(writer_, "1.0", "UTF-8", NULL);
+    xmlTextWriterSetIndent(writer_, 1);
+    if ( dtdInfo_.name != "" ) {
+        xmlTextWriterStartDTD(writer_, 
+                BAD_CAST dtdInfo_.name.c_str(),
+                BAD_CAST dtdInfo_.id.c_str(), 
+                BAD_CAST dtdInfo_.url.c_str());
+        xmlTextWriterEndDTD(writer_);
+    }
 }
 
 void XMLDocument::writeNode(XMLNode& node) {
@@ -55,4 +75,6 @@ void XMLDocument::writeAttributes(map<string, string> &attr) {
                 BAD_CAST it->second.c_str());
     }
 }
+
+
 

@@ -13,40 +13,44 @@ xmlTextWriterPtr MemoryWriter::getWriter() {
     return writer_;
 }
 
-void startDocument(xmlTextWriterPtr writer) {
-    xmlTextWriterStartDocument(writer, "1.0", "UTF-8", NULL);
-    xmlTextWriterSetIndent(writer, 1);
+XMLDocument::XMLDocument(xmlTextWriterPtr writer) :
+    writer_(writer) {
+    xmlTextWriterStartDocument(writer_, "1.0", "UTF-8", NULL);
+    xmlTextWriterSetIndent(writer_, 1);
 }
 
-void writeNode(xmlTextWriterPtr writer, XMLNode& node) {
-    xmlTextWriterStartElement(writer, BAD_CAST node.name.c_str());
+XMLDocument::~XMLDocument() {
+    xmlTextWriterEndDocument(writer_);
+}
+
+void XMLDocument::writeNode(XMLNode& node) {
+    xmlTextWriterStartElement(writer_, BAD_CAST node.name.c_str());
     if ( node.attributes.size() > 0 ) {
-        writeAttributes(writer, node.attributes);
+        writeAttributes(node.attributes);
     }
     if ( node.children.size() > 0 ) {
-        writeChildren(writer, node.children);
+        writeChildren(node.children);
     } else if ( node.text.length() > 0 ) {
-        xmlTextWriterWriteString(writer, BAD_CAST node.text.c_str());
+        xmlTextWriterWriteString(writer_, BAD_CAST node.text.c_str());
     }
-    xmlTextWriterEndElement(writer);
+    xmlTextWriterEndElement(writer_);
 }
 
-void writeChildren(xmlTextWriterPtr writer, XMLNode::MapType &children) {
+void XMLDocument::writeChildren(XMLNode::MapType &children) {
     for ( XMLNode::MapType::iterator it = children.begin();
             it != children.end(); it++ ) {
         XMLNode::ListType &list = it->second;
         for ( XMLNode::ListType::iterator it1 = list.begin();
                 it1 != list.end(); it1++ ) {
-            writeNode(writer, *it1);
+            writeNode(*it1);
         }
     }
 }
 
-void writeAttributes(xmlTextWriterPtr writer,
-        map<string, string> &attr) {
+void XMLDocument::writeAttributes(map<string, string> &attr) {
     for ( map<string, string>::iterator it = attr.begin();
             it != attr.end(); it++ ) {
-        xmlTextWriterWriteAttribute(writer,
+        xmlTextWriterWriteAttribute(writer_,
                 BAD_CAST it->first.c_str(),
                 BAD_CAST it->second.c_str());
     }

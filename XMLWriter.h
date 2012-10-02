@@ -18,10 +18,18 @@ private:
     xmlTextWriterPtr writer_;
 };
 
-void startDocument(xmlTextWriterPtr writer);
-void writeNode(xmlTextWriterPtr writer, XMLNode& node);
-void writeChildren(xmlTextWriterPtr writer, XMLNode::MapType &children);
-void writeAttributes(xmlTextWriterPtr writer, map<string, string> &attr);
+class XMLDocument {
+public:
+    XMLDocument(xmlTextWriterPtr writer);
+    ~XMLDocument();
+
+    void writeNode(XMLNode& node);
+    void writeChildren(XMLNode::MapType &children);
+    void writeAttributes(map<string, string> &attr);
+
+private:
+    xmlTextWriterPtr writer_;
+};
 
 template <class Medium>
 class XMLWriter {
@@ -36,14 +44,15 @@ public:
     }
 
     void write() {
-        startDocument(medium_.getWriter());
+        XMLDocument doc(medium_.getWriter());
         for ( XMLNode::ListType::iterator it = nodeList.begin();
                 it != nodeList.end(); it++ ) {
-            writeNode(medium_.getWriter(), *it);
+            doc.writeNode(*it);
         }
     }
 
 private:
+    XMLDocument doc_;
     Medium medium_;
     XMLNode::ListType nodeList;
 };

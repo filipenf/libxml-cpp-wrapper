@@ -8,12 +8,11 @@ XMLNode XMLNode::NULL_NODE;
 XMLNode const XMLNode::END_NODE;
 
 XMLNode& XMLNode::operator[](const string &name) {
-    XMLNode::MapType::iterator it = children.find(name); 
-    if ( it != children.end() ) {
-        return *it->second.begin();
-    } else {
-        return NULL_NODE;
+    XMLNode::ListType &list = children[name];
+    if ( list.size() == 0 ) {
+        list.push_front(XMLNode());
     }
+    return list.front();
 }
 
 bool XMLNode::hasChild(const string &name) {

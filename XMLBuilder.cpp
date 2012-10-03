@@ -1,16 +1,23 @@
-#include "XMLWriter.h"
+#include "XMLBuilder.h"
 
-MemoryWriter::MemoryWriter() {
+using std::string;
+
+XMLMemoryWriter::XMLMemoryWriter() {
     buffer_ = xmlBufferCreate();
     writer_ = xmlNewTextWriterMemory(buffer_, 0);
 }
 
-MemoryWriter::~MemoryWriter() {
+XMLMemoryWriter::~XMLMemoryWriter() {
     xmlBufferFree(buffer_);
+    xmlFreeTextWriter(writer_);
 }
 
-xmlTextWriterPtr MemoryWriter::getWriter() {
+xmlTextWriterPtr XMLMemoryWriter::getWriter() {
     return writer_;
+}
+
+string XMLMemoryWriter::getContent() {
+    return string((const char*)buffer_->content);
 }
 
 /*************************************************************

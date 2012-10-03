@@ -9,23 +9,22 @@
 #include <libxml/parser.h> 
 #include <libxml/tree.h> 
 
-using std::string;
-
-class MemoryWriter {
+class XMLMemoryWriter {
 public:
-    MemoryWriter();
-    ~MemoryWriter();
+    XMLMemoryWriter();
+    ~XMLMemoryWriter();
     
     xmlTextWriterPtr getWriter();
+    std::string getContent();
 private:
     xmlBufferPtr buffer_; 
     xmlTextWriterPtr writer_;
 };
 
 struct DTDInfo {
-    string name;
-    string id;
-    string url;
+    std::string name;
+    std::string id;
+    std::string url;
 };
 
 class XMLDocument {
@@ -37,27 +36,27 @@ public:
     void init();
     void writeNode(XMLNode& node);
     void writeChildren(XMLNode::MapType &children);
-    void writeAttributes(map<string, string> &attr);
+    void writeAttributes(map<std::string, std::string> &attr);
 
 private:
     xmlTextWriterPtr writer_;
     DTDInfo dtdInfo_;
 };
 
-template <class Medium>
-class XMLWriter {
+template <class Writer>
+class XMLBuilder {
 public:
-    XMLWriter() {
+    XMLBuilder(Writer &m) : writer_(m) {
     }
     
-    ~XMLWriter();
+    ~XMLBuilder();
 
     void addNode(const XMLNode &n) {
         nodeList.push_back(n);
     }
 
     void write() {
-        XMLDocument doc(medium_.getWriter());
+        XMLDocument doc(writer_.getWriter());
         for ( XMLNode::ListType::iterator it = nodeList.begin();
                 it != nodeList.end(); it++ ) {
             doc.writeNode(*it);
@@ -66,7 +65,7 @@ public:
 
 private:
     XMLDocument doc_;
-    Medium medium_;
+    Writer &writer_;
     XMLNode::ListType nodeList;
 };
 

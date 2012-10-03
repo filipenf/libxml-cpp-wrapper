@@ -49,6 +49,11 @@ public:
     XMLBuilder(Writer &m) : writer_(m) {
     }
     
+    XMLBuilder(Writer &m, DTDInfo& dtdInfo) :
+        writer_(m),
+        dtdInfo_(dtdInfo) {
+    }
+    
     ~XMLBuilder();
 
     void addNode(const XMLNode &n) {
@@ -56,7 +61,7 @@ public:
     }
 
     void write() {
-        XMLDocument doc(writer_.getWriter());
+        XMLDocument doc(writer_.getWriter(), dtdInfo_);
         for ( XMLNode::ListType::iterator it = nodeList.begin();
                 it != nodeList.end(); it++ ) {
             doc.writeNode(*it);
@@ -64,8 +69,8 @@ public:
     }
 
 private:
-    XMLDocument doc_;
     Writer &writer_;
+    DTDInfo dtdInfo_;
     XMLNode::ListType nodeList;
 };
 

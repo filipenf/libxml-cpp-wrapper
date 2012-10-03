@@ -8,7 +8,6 @@ XMLMemoryWriter::XMLMemoryWriter() {
 }
 
 XMLMemoryWriter::~XMLMemoryWriter() {
-//    xmlBufferFree(buffer_);
     xmlFreeTextWriter(writer_);
 }
 
@@ -44,13 +43,16 @@ XMLDocument::~XMLDocument() {
 
 void XMLDocument::init() {
     init_ = true;
-    xmlTextWriterStartDocument(writer_, "1.0", "UTF-8", NULL);
-    xmlTextWriterSetIndent(writer_, 1);
+    if ( xmlTextWriterStartDocument(writer_, "1.0", "UTF-8", NULL) < 0 )
+        throw XMLError("Error starting the document.");
+    if (xmlTextWriterSetIndent(writer_, 2) < 0 )
+        throw XMLError("Error set document indentation");
     if ( dtdInfo_.name != "" ) {
-        xmlTextWriterStartDTD(writer_, 
-                BAD_CAST dtdInfo_.name.c_str(),
-                BAD_CAST dtdInfo_.id.c_str(), 
-                BAD_CAST dtdInfo_.url.c_str());
+        if (xmlTextWriterStartDTD(writer_, 
+                    BAD_CAST dtdInfo_.name.c_str(),
+                    BAD_CAST dtdInfo_.id.c_str(), 
+                    BAD_CAST dtdInfo_.url.c_str()) < 0)
+            throw XMLError("Error setting DTD information");
         xmlTextWriterEndDTD(writer_);
     }
 }
@@ -60,16 +62,20 @@ void XMLDocument::end() {
 }
 
 void XMLDocument::writeNode(XMLNode& node) {
-    xmlTextWriterStartElement(writer_, BAD_CAST node.name.c_str());
+    if (xmlTextWriterStartElement(writer_, BAD_CAST node.name.c_str()) < 0)
+        throw XMLError("Error starting element " + node.name);
     if ( node.attributes.size() > 0 ) {
         writeAttributes(node.attributes);
     }
     if ( node.children.size() > 0 ) {
         writeChildren(node.children);
     } else if ( node.text.length() > 0 ) {
-        xmlTextWriterWriteString(writer_, BAD_CAST node.text.c_str());
+        if (xmlTextWriterWriteString(writer_, BAD_CAST node.text.c_str()) < 0)
+            throw XMLError("Error seting node's value "+node.text);
+
     }
-    xmlTextWriterEndElement(writer_);
+    if (xmlTextWriterEndElement(writer_) < 0)
+        throw XMLError("Error closing element "+node.name);
 }
 
 void XMLDocument::writeChildren(XMLNode::MapType &children) {

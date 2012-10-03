@@ -4,6 +4,7 @@
 #include "XMLNode.h"
 
 #include <string>
+#include <stdexcept>
 #include <libxml/encoding.h> 
 #include <libxml/xmlwriter.h> 
 #include <libxml/parser.h> 
@@ -13,6 +14,12 @@
 #include <iostream>
 #define LOG_DEBUG(X) std::cout << X << std::endl;
 #endif
+
+class XMLError : public std::runtime_error {
+public:
+    XMLError(const std::string& err) : 
+        runtime_error(err) {};
+};
 
 class XMLMemoryWriter {
 public:

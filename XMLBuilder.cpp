@@ -8,7 +8,7 @@ XMLMemoryWriter::XMLMemoryWriter() {
 }
 
 XMLMemoryWriter::~XMLMemoryWriter() {
-    xmlBufferFree(buffer_);
+//    xmlBufferFree(buffer_);
     xmlFreeTextWriter(writer_);
 }
 
@@ -26,19 +26,24 @@ string XMLMemoryWriter::getContent() {
  ************************************************************/
 
 XMLDocument::XMLDocument(xmlTextWriterPtr writer) :
-    writer_(writer) {
+    writer_(writer),
+    init_(false) {
 }
 
 XMLDocument::XMLDocument(xmlTextWriterPtr writer, const DTDInfo &info) :
     writer_(writer),
-    dtdInfo_(info) {
+    dtdInfo_(info),
+    init_(false) {
 }
 
 XMLDocument::~XMLDocument() {
-    xmlTextWriterEndDocument(writer_);
+    if ( init_ ) {
+        end();
+    }
 }
 
 void XMLDocument::init() {
+    init_ = true;
     xmlTextWriterStartDocument(writer_, "1.0", "UTF-8", NULL);
     xmlTextWriterSetIndent(writer_, 1);
     if ( dtdInfo_.name != "" ) {
@@ -48,6 +53,10 @@ void XMLDocument::init() {
                 BAD_CAST dtdInfo_.url.c_str());
         xmlTextWriterEndDTD(writer_);
     }
+}
+
+void XMLDocument::end() {
+    xmlTextWriterEndDocument(writer_);
 }
 
 void XMLDocument::writeNode(XMLNode& node) {

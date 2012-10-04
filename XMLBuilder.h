@@ -82,7 +82,6 @@ public:
     }
 
     void write() {
-        LOG_DEBUG("XMLBuilder::write");
         XMLDocument doc(writer_.getWriter(), dtdInfo_);
         doc.init();
         for ( XMLNode::ListType::iterator it = nodeList.begin();

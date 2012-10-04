@@ -9,11 +9,7 @@
 #include <libxml/xmlwriter.h> 
 #include <libxml/parser.h> 
 #include <libxml/tree.h> 
-
-#ifndef LOG_DEBUG
-#include <iostream>
-#define LOG_DEBUG(X) std::cout << X << std::endl;
-#endif
+#include "Log.h"
 
 class XMLError : public std::runtime_error {
 public:
@@ -37,6 +33,15 @@ struct DTDInfo {
     std::string name;
     std::string id;
     std::string url;
+
+    DTDInfo(const std::string &n, const std::string &i, const std::string &u) :
+        name(n),
+        id(i),
+        url(u) {
+    };
+
+    DTDInfo() {
+    };
 };
 
 class XMLDocument {

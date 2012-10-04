@@ -36,12 +36,14 @@ XMLDocument::XMLDocument(xmlTextWriterPtr writer, const DTDInfo &info) :
 }
 
 XMLDocument::~XMLDocument() {
+    LOG_DEBUG("XMLDocument::~");
     if ( init_ ) {
         end();
     }
 }
 
 void XMLDocument::init() {
+    LOG_DEBUG("XMLDocument::init");
     init_ = true;
     if ( xmlTextWriterStartDocument(writer_, "1.0", "UTF-8", NULL) < 0 )
         throw XMLError("Error starting the document.");
@@ -53,15 +55,18 @@ void XMLDocument::init() {
                     BAD_CAST dtdInfo_.id.c_str(), 
                     BAD_CAST dtdInfo_.url.c_str()) < 0)
             throw XMLError("Error setting DTD information");
-        xmlTextWriterEndDTD(writer_);
+        if (xmlTextWriterEndDTD(writer_) < 0 )
+            throw XMLError("Error setting DTD information");
     }
 }
 
 void XMLDocument::end() {
-    xmlTextWriterEndDocument(writer_);
+    if ( xmlTextWriterEndDocument(writer_) < 0 )
+        throw XMLError("Error trying to close the document");
 }
 
 void XMLDocument::writeNode(XMLNode& node) {
+        LOG_DEBUG("XMLDocument::writeNode - node="+node.name);
     if (xmlTextWriterStartElement(writer_, BAD_CAST node.name.c_str()) < 0)
         throw XMLError("Error starting element " + node.name);
     if ( node.attributes.size() > 0 ) {
@@ -70,6 +75,7 @@ void XMLDocument::writeNode(XMLNode& node) {
     if ( node.children.size() > 0 ) {
         writeChildren(node.children);
     } else if ( node.text.length() > 0 ) {
+        LOG_DEBUG("Writing node's text " + node.text);
         if (xmlTextWriterWriteString(writer_, BAD_CAST node.text.c_str()) < 0)
             throw XMLError("Error seting node's value "+node.text);
 
@@ -79,6 +85,7 @@ void XMLDocument::writeNode(XMLNode& node) {
 }
 
 void XMLDocument::writeChildren(XMLNode::MapType &children) {
+    LOG_DEBUG("XMLDocument::writeChildren");
     for ( XMLNode::MapType::iterator it = children.begin();
             it != children.end(); it++ ) {
         XMLNode::ListType &list = it->second;
@@ -90,11 +97,13 @@ void XMLDocument::writeChildren(XMLNode::MapType &children) {
 }
 
 void XMLDocument::writeAttributes(map<string, string> &attr) {
+    LOG_DEBUG("XMLDocument::writeAttributes");
     for ( map<string, string>::iterator it = attr.begin();
             it != attr.end(); it++ ) {
-        xmlTextWriterWriteAttribute(writer_,
+        if ( xmlTextWriterWriteAttribute(writer_,
                 BAD_CAST it->first.c_str(),
-                BAD_CAST it->second.c_str());
+                BAD_CAST it->second.c_str()) < 0)
+            throw XMLError("Error adding attribute: " + it->first);
     }
 }
 

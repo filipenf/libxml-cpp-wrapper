@@ -6,8 +6,15 @@ project (xmlcppwrapper)
 file(GLOB SOURCE RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 file(GLOB HEADER RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.h")
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0 -Wall -fPIC")
+    set( CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3 -DDEBUG")
+    set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3" )
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
     /usr/local/include/libxml2/
 )
 

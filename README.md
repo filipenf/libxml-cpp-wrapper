@@ -19,9 +19,21 @@ For a xml like this:
     </Customer>
 </CustomerList>
 ```
-The code to parse and get the value of OfficePhone tag is:
+The code to write such file is:
 ```c++
-xml_string = "<...>";
+    XMLMemoryWriter writer;
+    XMLBuilder<XMLMemoryWriter> builder(writer);
+    XMLNode &root = builder.addNode("CustomerList");
+    root.attributes["version"] = "1.0";
+    root["Customer"]["Name"].text = "John Smith";
+    root["Customer"]["ContactInfo"]["Address"].text = "22 Acacia Avenue";
+    root["Customer"]["ContactInfo"]["OfficePhone"].text = "+11 222 333 444";
+    builder.write();
+    cout << writer.getContent() << endl;
+```
+
+And the code to parse and get the value of OfficePhone tag is:
+```c++
 list<XMLNode> nodes;
 XMLReader<XMLMemoryParser> reader(xml_string);
 reader.parse(nodes);

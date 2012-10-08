@@ -32,7 +32,6 @@ XMLNode& XMLNode::addChild(const string &name) {
     XMLNode::ListType &list = children[name];
     list.push_back(XMLNode(name));
     XMLNode &node = list.back();
-    node.name = name;
     return node;
 }
 

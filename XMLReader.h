@@ -29,11 +29,15 @@ public:
 };
 
 struct XMLFileParser {
-    xmlDocPtr parse(const std::string &);
+    xmlDocPtr parse(const std::string &file) {
+        return xmlParseFile(file.c_str());
+    }
 };
 
 struct XMLMemoryParser {
-    xmlDocPtr parse(const std::string &);
+    xmlDocPtr parse(const std::string &xml) {
+        return xmlParseMemory(xml.c_str(), xml.size());
+    }
 };
 
 void getAttributes(xmlNode *node, map<string,string>&data);
